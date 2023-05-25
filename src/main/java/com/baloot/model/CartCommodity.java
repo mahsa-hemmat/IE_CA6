@@ -29,6 +29,19 @@ public class CartCommodity {
         quantity = 1;
     }
 
+    public CartCommodity(int id, String name, int providerId, int price, Set<Category> categories, double rating
+            , int inStock, String image) {
+        this.id = id;
+        this.name = name;
+        this.providerId = providerId;
+        this.price = price;
+        this.categories = categories;
+        this.rating = rating;
+        this.inStock = inStock;
+        this.image = image;
+        this.quantity = 1;
+    }
+
     public int getQuantity() {
         return quantity;
     }

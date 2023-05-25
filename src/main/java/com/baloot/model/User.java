@@ -17,10 +17,10 @@ public class User {
     private String birthDate;
     private String address;
     private int credit;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BuyList> buyList;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<HistoryList> historyList;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<BuyList> buyList = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<HistoryList> historyList = new ArrayList<>();
 
 
     @ManyToMany

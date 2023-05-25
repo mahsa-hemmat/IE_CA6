@@ -20,8 +20,8 @@ public class BuyList {
     @MapsId("commodity_id")
     private Commodity commodity;
 
-    @Column(columnDefinition = "Integer DEFAULT 1")
-    private Integer inCart;
+    @Column(columnDefinition = "int DEFAULT '1'")
+    private int inCart;
     public BuyList() {}
 
     public BuyList(User user, Commodity commodity){
@@ -53,11 +53,11 @@ public class BuyList {
         this.commodity = commodity;
     }
 
-    public Integer getInCart() {
+    public int getInCart() {
         return inCart;
     }
 
-    public void setInCart(Integer inCart) {
+    public void setInCart(int inCart) {
         this.inCart = inCart;
     }
 

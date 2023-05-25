@@ -8,6 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.baloot.model.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 import java.util.*;
 
@@ -31,18 +34,25 @@ public class UserController {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
-    }
+    }*/
 
     @GetMapping("/buylist")
     public ResponseEntity<Object> getBuyList() {
         try {
-            User user = BalootSystem.getInstance().getLoggedInUser();
-            return ResponseEntity.status(HttpStatus.OK).body(user.getBuyList().getCommodities().values());
+            //User user = BalootSystem.getInstance().getLoggedInUser();
+            List<List<Object>> results = balootSystem.getBuyList("amir");
+            List<CartCommodity> commodities = new ArrayList<>();
+            for (List<Object> re:results) {
+                CartCommodity c = new CartCommodity((Integer) re.get(0), (String) re.get(1), (Integer) re.get(5), (Integer) re.get(2),
+                        (Set<Category>) re.get(7), (Double) re.get(3), (Integer) re.get(4), (String) re.get(6));
+                commodities.add(c);
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(commodities);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
-    }*/
+    }
 
     @PostMapping("/buylist")
     public ResponseEntity<Object> addToBuyList(@RequestParam(value = "commodityId") int commodityId) {
@@ -62,33 +72,45 @@ public class UserController {
         }
     }
 
-    /*@DeleteMapping("/buylist")
+    @DeleteMapping("/buylist")
     public ResponseEntity<Object> removeFromBuyList(@RequestParam(value = "commodityId") int commodityId) {
         try {
-            User user = BalootSystem.getInstance().getLoggedInUser();
-            user.getBuyList().removeCommodity(commodityId);
-            return ResponseEntity.status(HttpStatus.OK).body("Commodity is removed from buylist successfully.");
+            //User user = BalootSystem.getInstance().getLoggedInUser();
+            balootSystem.removeCommodityFromBuyList("amir", commodityId);
+            return ResponseEntity.status(HttpStatus.OK).body("Commodity is removed from buy list successfully.");
         } catch (CommodityNotFoundException ex) {
             System.out.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        } catch (InValidInputException ex) {
-            System.out.println(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+        //} catch (InValidInputException ex) {
+        //    System.out.println(ex.getMessage());
+        //    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+        } catch (UserNotFoundException e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
     @GetMapping("/history")
     public ResponseEntity<Object> getHistory() {
         try {
-            User user = BalootSystem.getInstance().getLoggedInUser();
-            return ResponseEntity.status(HttpStatus.CREATED).body(user.getPurchasedList().values());
-        } catch (InValidInputException ex) {
-            System.out.println(ex.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+            //User user = BalootSystem.getInstance().getLoggedInUser();
+            List<List<Object>> results = balootSystem.getHistoryList("amir");
+            List<CartCommodity> commodities = new ArrayList<>();
+            for (List<Object> re:results) {
+                CartCommodity c = new CartCommodity((Integer) re.get(0), (String) re.get(1), (Integer) re.get(5), (Integer) re.get(2),
+                    (Set<Category>) re.get(7), (Double) re.get(3), (Integer) re.get(4), (String) re.get(6));
+                commodities.add(c);
+            }
+            return ResponseEntity.status(HttpStatus.CREATED).body(commodities);
+        //} catch (InValidInputException ex) {
+        //    System.out.println(ex.getMessage());
+        //    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+        } catch (UserNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    @PostMapping("/credit")
+    /*@PostMapping("/credit")
     public ResponseEntity<Object> addCredit(@RequestParam(value = "credit") int credit) {
         try {
             BalootSystem.getInstance().getLoggedInUser();
