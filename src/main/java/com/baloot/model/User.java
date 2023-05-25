@@ -17,10 +17,11 @@ public class User {
     private String birthDate;
     private String address;
     private int credit;
-    @OneToOne(cascade = CascadeType.ALL)
-    private BuyList buyList;
-    @OneToOne(cascade = CascadeType.ALL)
-    private HistoryList historyList;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BuyList> buyList;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HistoryList> historyList;
+
 
     @ManyToMany
     @JoinTable(
@@ -91,19 +92,19 @@ public class User {
     public void setCredit(int credit) {
         this.credit = credit;
     }
-    public BuyList getBuyList() {
+    public List<BuyList> getBuyList() {
         return buyList;
     }
 
-    public void setBuyList(BuyList buyList) {
+    public void setBuyList(List<BuyList> buyList) {
         this.buyList = buyList;
     }
 
-    public HistoryList getHistoryList() {
+    public List<HistoryList> getHistoryList() {
         return historyList;
     }
 
-    public void setHistoryList(HistoryList historyList) {
+    public void setHistoryList(List<HistoryList> historyList) {
         this.historyList = historyList;
     }
 

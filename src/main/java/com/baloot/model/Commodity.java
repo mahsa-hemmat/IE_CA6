@@ -30,6 +30,10 @@ public class Commodity {
     private Integer inStock;
     @Column(length = 1024)
     private String image;
+    @OneToMany(mappedBy = "commodity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BuyList> buyLists;
+    @OneToMany(mappedBy = "commodity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HistoryList> historyLists;
     @Transient
     private double totalRating = 0;
     @Transient
@@ -99,6 +103,22 @@ public class Commodity {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public List<BuyList> getBuyList() {
+        return buyLists;
+    }
+
+    public void setBuyList(List<BuyList> buyLists) {
+        this.buyLists = buyLists;
+    }
+
+    public List<HistoryList> getHistoryLists() {
+        return historyLists;
+    }
+
+    public void setHistoryLists(List<HistoryList> historyLists) {
+        this.historyLists = historyLists;
     }
     /*public Map<UUID, Comment> getComments() {
         return comments;

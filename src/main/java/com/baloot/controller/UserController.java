@@ -3,6 +3,7 @@ package com.baloot.controller;
 import com.baloot.exception.*;
 import com.baloot.info.*;
 import com.baloot.service.BalootSystem;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,11 @@ import java.util.*;
 @RestController
 @RequestMapping(value = "/user")
 public class UserController {
+    private final BalootSystem balootSystem;
+    @Autowired
+    public UserController(BalootSystem balootSystem) {
+        this.balootSystem = balootSystem;
+    }
 
     /*
     @GetMapping("")
@@ -36,13 +42,13 @@ public class UserController {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
-    }
+    }*/
 
     @PostMapping("/buylist")
     public ResponseEntity<Object> addToBuyList(@RequestParam(value = "commodityId") int commodityId) {
         try {
-            BalootSystem.getInstance().getLoggedInUser();
-            BalootSystem.getInstance().getDataBase().addToBuyList(commodityId);
+            //BalootSystem.getInstance().getLoggedInUser();
+            balootSystem.addToBuyList("amir" ,commodityId);
             return ResponseEntity.status(HttpStatus.OK).body("Commodity is added to buylist successfully.");
         } catch (OutOfStockException ex) {
             System.out.println(ex.getMessage());
@@ -56,7 +62,7 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/buylist")
+    /*@DeleteMapping("/buylist")
     public ResponseEntity<Object> removeFromBuyList(@RequestParam(value = "commodityId") int commodityId) {
         try {
             User user = BalootSystem.getInstance().getLoggedInUser();

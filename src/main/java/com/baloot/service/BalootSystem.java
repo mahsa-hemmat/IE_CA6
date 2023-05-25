@@ -1,14 +1,12 @@
 package com.baloot.service;
 
-import com.baloot.exception.CommodityNotFoundException;
-import com.baloot.exception.InValidInputException;
-import com.baloot.exception.ProviderNotFoundException;
-import com.baloot.exception.UserNotFoundException;
+import com.baloot.exception.*;
 import com.baloot.model.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -30,6 +29,7 @@ public class BalootSystem {
     private final CategoryService categoryService ;
     private final UserService userService;
     private final DiscountService discountService;
+    private final BuyListService buyListService;
 
 
     private DataBase db = new DataBase();
@@ -37,12 +37,13 @@ public class BalootSystem {
 
     @Autowired
     public BalootSystem(ProviderService ps, CommodityService cs, CategoryService cas, UserService us,
-                        DiscountService ds) {
+                        DiscountService ds, BuyListService buys) {
         this.providerService = ps;
         this.commodityService = cs;
         this.categoryService = cas;
         this.userService = us;
         this.discountService = ds;
+        this.buyListService = buys;
     }
     /*public static BalootSystem getInstance(){
         if(instance == null) {
@@ -178,18 +179,27 @@ public class BalootSystem {
     public Provider getProvider(int id) throws ProviderNotFoundException {
         return providerService.getProviderById(id);
     }
+    public User getUser(String username) throws UserNotFoundException {
+        return userService.findUserById(username);
+    }
+    public Commodity getCommodity(int id) throws CommodityNotFoundException {
+        return commodityService.getCommodityById(id);
+    }
     public void increaseCredit(int credit){db.increaseCredit(credit);}
     //public Provider getProvider(int id) throws ProviderNotFoundException { return db.getProviderById(id); }
-    public void addToCart(String userId, int commodityId) throws UserNotFoundException, CommodityNotFoundException {
+    public void addToBuyList(String userId, int commodityId) throws UserNotFoundException, CommodityNotFoundException, InValidInputException, OutOfStockException {
         User user = userService.findUserById(userId);
         Commodity commodity = commodityService.getCommodityById(commodityId);
-
-        // Create a new CartCommodity instance and add it to the user's buy list
-        CartCommodity cartCommodity = new CartCommodity(commodity);
-        user.getBuyList().addCartCommodity(cartCommodity);
-
-        // Update the user in the database
-        userRepository.save(user);
+        if(commodity.getInStock() == 0)
+            throw new OutOfStockException(commodityId);
+        if(!user.getBuyList().isEmpty()){
+            for(BuyList buyList:user.getBuyList()){
+                if(buyList.getCommodity().equals(commodity))
+                    throw new InValidInputException("Commodity is already added to buy list");
+            }
+        }
+        BuyList buyList = new BuyList(user, commodity);
+        user.getBuyList().add(buyList);
+        userService.save(user);
     }
-
 }

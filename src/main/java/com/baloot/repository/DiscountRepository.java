@@ -10,7 +10,5 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface DiscountRepository extends JpaRepository<Discount, Integer> {
-    @Query("select d from Discount d where d.discountCode = ?1")
-    Optional<Discount> findById(String discount_code);
+public interface DiscountRepository extends JpaRepository<Discount, String> { ;
 }

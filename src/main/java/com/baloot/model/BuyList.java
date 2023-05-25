@@ -20,11 +20,15 @@ public class BuyList {
     @MapsId("commodity_id")
     private Commodity commodity;
 
-    @ColumnDefault("1")
+    @Column(columnDefinition = "Integer DEFAULT 1")
     private Integer inCart;
+    public BuyList() {}
 
-    public BuyList(){}
-
+    public BuyList(User user, Commodity commodity){
+        this.id = new BuyListId(user.getUsername(), commodity.getId());
+        this.user = user;
+        this.commodity = commodity;
+    }
     public BuyListId getId() {
         return id;
     }
