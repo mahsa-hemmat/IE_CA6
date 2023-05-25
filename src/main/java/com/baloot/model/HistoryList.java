@@ -19,7 +19,16 @@ public class HistoryList {
     @ManyToOne
     @MapsId("commodity_id")
     private Commodity commodity;
-    private Integer quantity;
+    private int quantity;
+    public HistoryList(User user, Commodity commodity, int quantity){
+        this.id = new HistoryListId(user.getUsername(), commodity.getId());
+        this.user = user;
+        this.commodity = commodity;
+        this.quantity = quantity;
+    }
+
+    public HistoryList() {
+    }
 
     public HistoryListId getId() {
         return id;
@@ -45,11 +54,11 @@ public class HistoryList {
         this.commodity = commodity;
     }
 
-    public Integer getQuantity() {
+    public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 

@@ -1,16 +1,11 @@
 package com.baloot.model;
 
 import jakarta.persistence.*;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
 import java.util.*;
 
 @Entity
 @Table(name = "commodity")
 public class Commodity {
-
     @Id
     @Column(name = "id")
     private Integer id;
@@ -28,23 +23,23 @@ public class Commodity {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> categories = new HashSet<>();
-    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT '0.00'")
-    private Double rating;
+    @Column(name = "rating", columnDefinition = "DECIMAL(10,2) DEFAULT '0.00'")
+    private double rating;
     @Column(name = "in_stock")
     private Integer inStock;
     @Column(length = 1024)
     private String image;
-    @OneToMany(mappedBy = "commodity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BuyList> buyLists;
-    @OneToMany(mappedBy = "commodity", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<HistoryList> historyLists;
+    @OneToMany(mappedBy = "commodity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<BuyList> buyLists = new ArrayList<>();
+    @OneToMany(mappedBy = "commodity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<HistoryList> historyLists = new ArrayList<>();
     @Transient
     private double totalRating = 0;
     @Transient
     private int ratingCount = 1;
     //Map<UUID,Comment> comments = new HashMap<>();
     public Commodity(){}
-    public Commodity(Integer id, String name, Integer price, Double rating, Integer inStock, String image){
+    public Commodity(Integer id, String name, Integer price, double rating, Integer inStock, String image){
         this.id = id;
         this.name = name;
         this.price = price;
@@ -129,7 +124,7 @@ public class Commodity {
     }
     public void addComment(Comment comment){
         comments.put(comment.getId(), comment);
-    }*/
+    }
 
     public void updateInStock(){
         inStock--;
@@ -146,8 +141,5 @@ public class Commodity {
 
     public int getRatingCount() {
         return ratingCount;
-    }
-
-
+    }*/
 }
-
