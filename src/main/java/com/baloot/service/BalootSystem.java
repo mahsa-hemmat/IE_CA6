@@ -20,8 +20,6 @@ import java.util.*;
 
 @Component
 public class BalootSystem {
-    private static BalootSystem instance;  // can be removed later
-
     private final ProviderService providerService;
     private final CommodityService commodityService;
     private final CategoryService categoryService ;
@@ -29,10 +27,7 @@ public class BalootSystem {
     private final DiscountService discountService;
     private final BuyListService buyListService;
     private final HistoryListService historyListService;
-    private String loggedInUser;
-
-    private DataBase db = new DataBase();
-    //private BalootSystem() {}
+    private String loggedInUser = "";
 
     @Autowired
     public BalootSystem(ProviderService ps, CommodityService cs, CategoryService cas, UserService us,
@@ -45,20 +40,7 @@ public class BalootSystem {
         this.buyListService = buys;
         this.historyListService = hist;
     }
-    /*public static BalootSystem getInstance(){
-        if(instance == null) {
-            instance = new BalootSystem();
-            instance.readDataFromServer();
-        }
-        return instance;
-    }*/
 
-    /*public DataBase getDataBase(){
-        return db;
-    }*/
-    public User getLoggedInUser() throws InValidInputException {
-        return db.getLoggedInUser();
-    }
     @PostConstruct
     public void readDataFromServer() {
         try {
@@ -84,7 +66,7 @@ public class BalootSystem {
         String strJsonData = HTTPRequestHandler("http://5.253.25.110:5000/api/comments");
         ObjectMapper mapper = new ObjectMapper();
         List<Comment> comments = mapper.readValue(strJsonData, new TypeReference<List<Comment>>(){});
-        db.addComment(comments);
+        //db.addComment(comments);
     }
 
     private void importCommodities() throws Exception{
@@ -166,18 +148,25 @@ public class BalootSystem {
         return strJsonData;
     }
     public Boolean hasAnyUserLoggedIn(){
-        return db.hasAnyUserLoggedIn();
+        return Objects.equals(loggedInUser, "");
     }
-
-    public Boolean isUserValid(String username) throws Exception{
-        return db.getUserById(username) != null;
+    public void logOutUser() throws Exception {
+        if(!hasAnyUserLoggedIn())
+            throw new InValidInputException("No user has logged in.");
+        loggedInUser = "";
     }
-    public void loginInUser(String username, String password) throws Exception{
-        db.setLoggedInUser(username, password);
+    public User getLoggedInUser() throws InValidInputException, UserNotFoundException {
+        if (Objects.equals(loggedInUser, ""))
+            throw new InValidInputException("You are not logged in. Please login first");
+        return userService.findUserById(loggedInUser);
     }
-
-    //public void logOutUser() throws Exception {db.logOutUser();}
-
+    public void loginInUser(String username, String password) throws UserNotFoundException {
+        User user = userService.findUserById(username);
+        if(user != null){
+            if(user.getPassword().equals(password))
+                loggedInUser = user.getUsername();
+        }
+    }
     public Provider getProvider(int id) throws ProviderNotFoundException {
         return providerService.getProviderById(id);
     }
@@ -187,23 +176,7 @@ public class BalootSystem {
     public Commodity getCommodity(int id) throws CommodityNotFoundException {
         return commodityService.getCommodityById(id);
     }
-
-    public List<Commodity> getCommodities(){
-        return commodityService.getCommodities();
-    }
-//    public List<Commodity> filterByCategory(String category){
-//        return repo.f
-//    }
-
-    public List<Commodity> filterByName(String name){
-        return commodityService.filterByName(name);
-    }
-
-    public List<Commodity> filterByProviderName(String name){
-        return commodityService.filterByProviderName(name);
-    }
-    public void increaseCredit(int credit){db.increaseCredit(credit);}
-    //public Provider getProvider(int id) throws ProviderNotFoundException { return db.getProviderById(id); }
+    //public void increaseCredit(int credit){db.increaseCredit(credit);}
 
     @Transactional
     public void addToBuyList(String userId, int commodityId) throws UserNotFoundException, CommodityNotFoundException, InValidInputException, OutOfStockException {
@@ -241,7 +214,7 @@ public class BalootSystem {
         }
         userService.save(user);
     }
-  
+
     public List<Commodity> getHistoryList() {
         if(historyListService.findAll().isEmpty())
             return null;
