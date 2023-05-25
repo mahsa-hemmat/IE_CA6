@@ -52,7 +52,7 @@ public class DataBase {
             if(!(providers.containsKey(commodity.getProviderId())))
                 throw new ProviderNotFoundException(commodity.getProviderId());
             else {
-                commodity.setTotalRating(commodity.getRating());
+                //commodity.setTotalRating(commodity.getRating());
                 commodities.addCommodity(commodity);
                 providers.get(commodity.getProviderId()).addNewCommodity(commodity);
             }

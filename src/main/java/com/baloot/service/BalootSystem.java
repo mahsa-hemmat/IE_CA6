@@ -2,6 +2,7 @@ package com.baloot.service;
 
 import com.baloot.exception.*;
 import com.baloot.model.*;
+import com.baloot.model.id.BuyListId;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,10 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class BalootSystem {
@@ -30,20 +28,22 @@ public class BalootSystem {
     private final UserService userService;
     private final DiscountService discountService;
     private final BuyListService buyListService;
-
+    private final HistoryListService historyListService;
+    private String loggedInUser;
 
     private DataBase db = new DataBase();
     //private BalootSystem() {}
 
     @Autowired
     public BalootSystem(ProviderService ps, CommodityService cs, CategoryService cas, UserService us,
-                        DiscountService ds, BuyListService buys) {
+                        DiscountService ds, BuyListService buys, HistoryListService hist) {
         this.providerService = ps;
         this.commodityService = cs;
         this.categoryService = cas;
         this.userService = us;
         this.discountService = ds;
         this.buyListService = buys;
+        this.historyListService = hist;
     }
     /*public static BalootSystem getInstance(){
         if(instance == null) {
@@ -96,6 +96,8 @@ public class BalootSystem {
                 Commodity commodity = new Commodity(commodityNode.get("id").asInt(), commodityNode.get("name").asText(),
                         commodityNode.get("price").asInt(), commodityNode.get("rating").asDouble(), commodityNode.get("inStock").asInt(),
                         commodityNode.get("image").asText());
+                double rating = (double) commodityNode.get("rating").asDouble();
+                commodity.setRating(rating);
                 int providerId = commodityNode.get("providerId").asInt();
                 commodity.setProvider(providerService.getProviderById(providerId));
                 JsonNode categoriesNode = commodityNode.get("categories");
@@ -202,6 +204,8 @@ public class BalootSystem {
     }
     public void increaseCredit(int credit){db.increaseCredit(credit);}
     //public Provider getProvider(int id) throws ProviderNotFoundException { return db.getProviderById(id); }
+
+    @Transactional
     public void addToBuyList(String userId, int commodityId) throws UserNotFoundException, CommodityNotFoundException, InValidInputException, OutOfStockException {
         User user = userService.findUserById(userId);
         Commodity commodity = commodityService.getCommodityById(commodityId);
@@ -214,9 +218,60 @@ public class BalootSystem {
             }
         }
         BuyList buyList = new BuyList(user, commodity);
+        buyListService.save(buyList);
         user.getBuyList().add(buyList);
+        commodity.getBuyList().add(buyList);
+        userService.save(user);
+        commodityService.save(commodity);
+    }
+    public void removeCommodityFromBuyList(String userId,int commodityId) throws CommodityNotFoundException, UserNotFoundException {
+        BuyListId buyListId = new BuyListId(userId, commodityId);
+        if(!buyListService.existsById(buyListId))
+            throw new CommodityNotFoundException(commodityId);
+        buyListService.deleteById(buyListId);
+        User user = userService.findUserById(userId);
+        List<BuyList> buyLists = user.getBuyList();
+        Iterator<BuyList> iterator = buyLists.iterator();
+        while (iterator.hasNext()) {
+            BuyList currentBuyList = iterator.next();
+            if (currentBuyList.getId().equals(buyListId)) {
+                iterator.remove();
+                break;
+            }
+        }
         userService.save(user);
     }
+  
+    public List<Commodity> getHistoryList() {
+        if(historyListService.findAll().isEmpty())
+            return null;
+        List<HistoryList> historyLists = historyListService.findAll();
+        List<Commodity> commodities = new ArrayList<>();
+        for(HistoryList historyList:historyLists)
+            commodities.add(historyList.getCommodity());
+        return commodities;
+    }
+    public List<List<Object>> getHistoryList(String username) throws UserNotFoundException {
+        User user = userService.findUserById(username);
+        List<List<Object>> results = historyListService.getUserCommodities(user);
+        if(results.isEmpty())
+            return null;
+        for (List<Object> lo:results) {
+            Set<String> categories = commodityService.getCategoriesForCommodity((Integer) lo.get(0));
+            lo.add(categories);
+        }
+        return results;
+    }
 
-
+    public List<List<Object>> getBuyList(String username) throws UserNotFoundException {
+        User user = userService.findUserById(username);
+        List<List<Object>> results = buyListService.getUserCommodities(user);
+        if(results.isEmpty())
+            return null;
+        for (List<Object> lo:results) {
+            Set<String> categories = commodityService.getCategoriesForCommodity((Integer) lo.get(0));
+            lo.add(categories);
+        }
+        return results;
+    }
 }

@@ -1,9 +1,7 @@
 package com.baloot.service;
 
 import com.baloot.exception.CommodityNotFoundException;
-import com.baloot.exception.ProviderNotFoundException;
 import com.baloot.model.Commodity;
-import com.baloot.model.Provider;
 import com.baloot.repository.CommodityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class CommodityService {
@@ -43,5 +42,9 @@ public class CommodityService {
     }
     public void save(Commodity commodity) {
         repo.save(commodity);
+    }
+
+    public Set<String> getCategoriesForCommodity(int commodity_id){
+        return repo.getCategoriesForCommodity(commodity_id);
     }
 }
