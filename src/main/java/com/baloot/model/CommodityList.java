@@ -1,8 +1,10 @@
 package com.baloot.model;
 
 import com.baloot.exception.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
+
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CommodityList {
     Map<Integer, Commodity> commodities;
@@ -83,80 +85,83 @@ public class CommodityList {
         }
         return filteredCommodities;
     }*/
-
-    public List<Commodity> filterByName(String name) {
-        List<String> names = new ArrayList<>();
-        name = name.toLowerCase().trim().replaceAll("\\s+", " ");
-        if (name.contains(","))
-            names = Arrays.asList(name.trim().split("\\s*,\\s*"));
-        List<Commodity> allCommodities = new ArrayList<>(commodities.values());
-        List<Commodity> nameFiltered = new ArrayList<>();
-        if (names.isEmpty()) {
-            String finalName = name;
-            nameFiltered.addAll(allCommodities.stream()
-                    .filter(c -> c.getName().toLowerCase().contains(finalName))
-                    .toList());
-            return nameFiltered;
-        }
-        for(int i = 0; i < names.size(); i++) {
-            String substring = names.get(i);
-            if (i == 0) {
-                nameFiltered.addAll(allCommodities.stream()
-                        .filter(c -> c.getName().toLowerCase().contains(substring))
-                        .collect(Collectors.toList()));
-            } else {
-                nameFiltered = (nameFiltered.stream()
-                        .filter(c -> c.getName().toLowerCase().contains(substring))
-                        .collect(Collectors.toList()));
-            }
-        }
-        return nameFiltered;
+    @Autowired
+    private CommodityFinder commodityFinder;
+    public List<Commodity> filterByName(@Param("name") String name) {
+        return commodityFinder.filterByName(name);
+//        List<String> names = new ArrayList<>();
+//        name = name.toLowerCase().trim().replaceAll("\\s+", " ");
+//        if (name.contains(","))
+//            names = Arrays.asList(name.trim().split("\\s*,\\s*"));
+//        List<Commodity> allCommodities = new ArrayList<>(commodities.values());
+//        List<Commodity> nameFiltered = new ArrayList<>();
+//        if (names.isEmpty()) {
+//            String finalName = name;
+//            nameFiltered.addAll(allCommodities.stream()
+//                    .filter(c -> c.getName().toLowerCase().contains(finalName))
+//                    .toList());
+//            return nameFiltered;
+//        }
+//        for (int i = 0; i < names.size(); i++) {
+//            String substring = names.get(i);
+//            if (i == 0) {
+//                nameFiltered.addAll(allCommodities.stream()
+//                        .filter(c -> c.getName().toLowerCase().contains(substring))
+//                        .collect(Collectors.toList()));
+//            } else {
+//                nameFiltered = (nameFiltered.stream()
+//                        .filter(c -> c.getName().toLowerCase().contains(substring))
+//                        .collect(Collectors.toList()));
+//            }
+//        }
+//        return nameFiltered;
     }
 
     public List<Commodity> filterByCategory(String category){
-        List<String> cat = new ArrayList<>();
-        category = category.toLowerCase().trim().replaceAll("\\s+", " ");
-        if (category.contains(","))
-            cat = Arrays.asList(category.trim().split("\\s*,\\s*"));
-        else
-            cat.add(category);
-        List<Commodity> list= new ArrayList<>();
-        for(Commodity co : commodities.values()) {
-            List<Category> tempList = new ArrayList<>(co.getCategories());
-            //tempList.replaceAll(String::toLowerCase);
-            if (new HashSet<>(tempList).containsAll(cat))
-                list.add(co);
-        }
-        return list;
+        return commodityFinder.filterByCategory(category);
+//        List<String> cat = new ArrayList<>();
+//        category = category.toLowerCase().trim().replaceAll("\\s+", " ");
+//        if (category.contains(","))
+//            cat = Arrays.asList(category.trim().split("\\s*,\\s*"));
+//        else
+//            cat.add(category);
+//        List<Commodity> list= new ArrayList<>();
+//        for(Commodity co : commodities.values()) {
+//            List<Category> tempList = new ArrayList<>(co.getCategories());
+//            //tempList.replaceAll(String::toLowerCase);
+//            if (new HashSet<>(tempList).containsAll(cat))
+//                list.add(co);
+//        }
+//        return list;
     }
-
-    public List<Commodity> filterByProviderName(String name) {
-        List<String> names = new ArrayList<>();
-        name = name.toLowerCase().trim().replaceAll("\\s+", " ");
-        if (name.contains(","))
-            names = Arrays.asList(name.trim().split("\\s*,\\s*"));
-        List<Commodity> allCommodities = new ArrayList<>(commodities.values());
-        List<Commodity> nameFiltered = new ArrayList<>();
-        if (names.isEmpty()) {
-            String finalName = name;
-            nameFiltered.addAll(allCommodities.stream()
-                    .filter(c -> c.getName().toLowerCase().contains(finalName))
-                    .toList());
-            return nameFiltered;
-        }
-        for(int i = 0; i < names.size(); i++) {
-            String substring = names.get(i);
-            if (i == 0) {
-                nameFiltered.addAll(allCommodities.stream()
-                        .filter(c -> c.getName().toLowerCase().contains(substring))
-                        .collect(Collectors.toList()));
-            } else {
-                nameFiltered = (nameFiltered.stream()
-                        .filter(c -> c.getName().toLowerCase().contains(substring))
-                        .collect(Collectors.toList()));
-            }
-        }
-        return nameFiltered;
+    public List<Commodity> filterByProviderName(String name){
+        return commodityFinder.filterByProviderName(name);
+//        List<String> names = new ArrayList<>();
+//        name = name.toLowerCase().trim().replaceAll("\\s+", " ");
+//        if (name.contains(","))
+//            names = Arrays.asList(name.trim().split("\\s*,\\s*"));
+//        List<Commodity> allCommodities = new ArrayList<>(commodities.values());
+//        List<Commodity> nameFiltered = new ArrayList<>();
+//        if (names.isEmpty()) {
+//            String finalName = name;
+//            nameFiltered.addAll(allCommodities.stream()
+//                    .filter(c -> c.getName().toLowerCase().contains(finalName))
+//                    .toList());
+//            return nameFiltered;
+//        }
+//        for(int i = 0; i < names.size(); i++) {
+//            String substring = names.get(i);
+//            if (i == 0) {
+//                nameFiltered.addAll(allCommodities.stream()
+//                        .filter(c -> c.getName().toLowerCase().contains(substring))
+//                        .collect(Collectors.toList()));
+//            } else {
+//                nameFiltered = (nameFiltered.stream()
+//                        .filter(c -> c.getName().toLowerCase().contains(substring))
+//                        .collect(Collectors.toList()));
+//            }
+//        }
+//        return nameFiltered;
     }
 
     public boolean hasCommodity(int id){
