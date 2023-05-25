@@ -30,5 +30,8 @@ public class ProviderService {
     public void save(Provider provider) {
         repo.save(provider);
     }
+    public void saveAll(List<Provider> providers){
+        repo.saveAll(providers);
+    }
 
 }

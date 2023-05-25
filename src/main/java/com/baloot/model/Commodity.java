@@ -36,6 +36,14 @@ public class Commodity {
     private int ratingCount = 1;
     //Map<UUID,Comment> comments = new HashMap<>();
     public Commodity(){}
+    public Commodity(Integer id, String name, Integer price, Double rating, Integer inStock, String image){
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.rating = rating;
+        this.inStock = inStock;
+        this.image = image;
+    }
     public int getId(){
         return id;
     }

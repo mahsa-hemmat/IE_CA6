@@ -28,16 +28,21 @@ public class BalootSystem {
     private final ProviderService providerService;
     private final CommodityService commodityService;
     private final CategoryService categoryService ;
+    private final UserService userService;
+    private final DiscountService discountService;
 
 
     private DataBase db = new DataBase();
     //private BalootSystem() {}
 
     @Autowired
-    public BalootSystem(ProviderService ps, CommodityService cs, CategoryService cas) {
+    public BalootSystem(ProviderService ps, CommodityService cs, CategoryService cas, UserService us,
+                        DiscountService ds) {
         this.providerService = ps;
         this.commodityService = cs;
         this.categoryService = cas;
+        this.userService = us;
+        this.discountService = ds;
     }
     /*public static BalootSystem getInstance(){
         if(instance == null) {
@@ -57,11 +62,11 @@ public class BalootSystem {
     public void readDataFromServer() {
         try {
             System.out.println("Importing data ...");
-            //importUsers();
+            importUsers();
             importProviders();
             importCommodities();
             //importComments();
-            //importDiscounts();
+            importDiscounts();
             System.out.println("Done");
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -70,8 +75,8 @@ public class BalootSystem {
     private void importDiscounts() throws Exception{
         String strJsonData = HTTPRequestHandler("http://5.253.25.110:5000/api/discount");
         ObjectMapper mapper = new ObjectMapper();
-        List<Discount> discounts = mapper.readValue(strJsonData, new TypeReference<List<Discount>>(){});
-        db.addDiscount(discounts);
+        List<Discount> discounts = mapper.readValue(strJsonData, new TypeReference<>() {});
+        discountService.saveAll(discounts);
     }
 
     private void importComments() throws Exception{
@@ -88,15 +93,11 @@ public class BalootSystem {
         List<Commodity> commodities = new ArrayList<>();
         if(jsonNode.isArray()){
             for (JsonNode commodityNode : jsonNode) {
-                Commodity commodity = new Commodity();
-                commodity.setId(commodityNode.get("id").asInt());
-                commodity.setName(commodityNode.get("name").asText());
+                Commodity commodity = new Commodity(commodityNode.get("id").asInt(), commodityNode.get("name").asText(),
+                        commodityNode.get("price").asInt(), commodityNode.get("rating").asDouble(), commodityNode.get("inStock").asInt(),
+                        commodityNode.get("image").asText());
                 int providerId = commodityNode.get("providerId").asInt();
                 commodity.setProvider(providerService.getProviderById(providerId));
-                commodity.setPrice(commodityNode.get("price").asInt());
-                commodity.setRating(commodityNode.get("rating").asDouble());
-                commodity.setInStock(commodityNode.get("inStock").asInt());
-                commodity.setImage(commodityNode.get("image").asText());
                 JsonNode categoriesNode = commodityNode.get("categories");
                 Set<Category> categories = new HashSet<>();
                 if (categoriesNode.isArray()) {
@@ -111,12 +112,9 @@ public class BalootSystem {
                     }
                 }
                 commodity.setCategories(categories);
-                commodities.add(commodity);
                 addCommodityToProvider(providerId, commodity);
+                commodityService.save(commodity);
             }
-        }
-        for (Commodity co:commodities) {
-            commodityService.save(co);
         }
     }
 
@@ -134,15 +132,14 @@ public class BalootSystem {
         String strJsonData = HTTPRequestHandler("http://5.253.25.110:5000/api/v2/providers");
         ObjectMapper mapper = new ObjectMapper();
         List<Provider> providers = mapper.readValue(strJsonData, new TypeReference<>() {});
-        for (Provider provider:providers)
-            providerService.save(provider);
+        providerService.saveAll(providers);
     }
 
     private void importUsers() throws Exception {
         String strJsonData = HTTPRequestHandler("http://5.253.25.110:5000/api/users");
         ObjectMapper mapper = new ObjectMapper();
-        List<User> users = mapper.readValue(strJsonData, new TypeReference<List<User>>(){});
-        db.addUser(users);
+        List<User> users = mapper.readValue(strJsonData, new TypeReference<>() {});
+        userService.saveAll(users);
     }
 
     private String HTTPRequestHandler(String users_url) throws URISyntaxException, IOException {

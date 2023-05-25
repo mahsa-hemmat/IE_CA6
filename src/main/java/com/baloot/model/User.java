@@ -8,7 +8,6 @@ import java.util.*;
 @Entity
 @Table(name = "user")
 public class User {
-
     @Id
     @Column(name = "id")
     private String username;

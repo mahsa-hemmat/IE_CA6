@@ -1,6 +1,7 @@
 package com.baloot.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,25 +9,17 @@ import java.util.List;
 @Entity
 @Table(name = "discount")
 public class Discount {
+
     @Id
-    @GeneratedValue
-    private Long id;
-    @Column(name = "discount_code")
+    @Column(name = "id")
     private String discountCode;
-    private Integer discountAmount;
-    @Column(name = "used", columnDefinition = "boolean default false")
-    private Boolean alreadyUsed;
+    private Integer discount;
+    @Column(name = "used", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean used;
     @ManyToMany(mappedBy = "discounts")
     private List<User> users = new ArrayList<>();
 
     public Discount(){}
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getId() {
-        return id;
-    }
 
     public String getDiscountCode() {
         return discountCode;
@@ -36,12 +29,20 @@ public class Discount {
         this.discountCode = discountCode;
     }
 
-    public int getDiscountAmount() {
-        return discountAmount;
+    public Integer getDiscount() {
+        return discount;
     }
 
-    public void setDiscountAmount(int discount) {
-        this.discountAmount = discount;
+    public void setDiscount(Integer discount) {
+        this.discount = discount;
+    }
+
+    public Boolean getUsed() {
+        return used;
+    }
+
+    public void setUsed(Boolean used) {
+        this.used = used;
     }
 
     public List<User> getUsers() {
