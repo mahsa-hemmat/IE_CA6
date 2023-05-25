@@ -21,6 +21,11 @@ public class Discount {
 
     public Discount(){}
 
+    public Discount(String discountCode, Integer discount){
+        this.discountCode = discountCode;
+        this.discount = discount;
+    }
+
     public String getDiscountCode() {
         return discountCode;
     }

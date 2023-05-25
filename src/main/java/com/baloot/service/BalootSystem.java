@@ -62,11 +62,11 @@ public class BalootSystem {
     public void readDataFromServer() {
         try {
             System.out.println("Importing data ...");
+            importDiscounts();
             importUsers();
             importProviders();
             importCommodities();
             //importComments();
-            importDiscounts();
             System.out.println("Done");
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -90,7 +90,6 @@ public class BalootSystem {
         String strJsonData = HTTPRequestHandler("http://5.253.25.110:5000/api/v2/commodities");
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(strJsonData);
-        List<Commodity> commodities = new ArrayList<>();
         if(jsonNode.isArray()){
             for (JsonNode commodityNode : jsonNode) {
                 Commodity commodity = new Commodity(commodityNode.get("id").asInt(), commodityNode.get("name").asText(),
@@ -133,13 +132,18 @@ public class BalootSystem {
         ObjectMapper mapper = new ObjectMapper();
         List<Provider> providers = mapper.readValue(strJsonData, new TypeReference<>() {});
         providerService.saveAll(providers);
+
     }
 
     private void importUsers() throws Exception {
         String strJsonData = HTTPRequestHandler("http://5.253.25.110:5000/api/users");
         ObjectMapper mapper = new ObjectMapper();
         List<User> users = mapper.readValue(strJsonData, new TypeReference<>() {});
+        for(User user:users){
+            user.setDiscounts(discountService.findAll());
+        }
         userService.saveAll(users);
+
     }
 
     private String HTTPRequestHandler(String users_url) throws URISyntaxException, IOException {

@@ -22,7 +22,7 @@ public class User {
     @OneToOne(cascade = CascadeType.ALL)
     private HistoryList historyList;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(
             name = "user_discount",
             joinColumns = @JoinColumn(name = "user_id"),

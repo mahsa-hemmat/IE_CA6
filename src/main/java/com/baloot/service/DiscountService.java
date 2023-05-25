@@ -29,5 +29,8 @@ public class DiscountService {
     public void saveAll(List<Discount> discount){
         repo.saveAll(discount);
     }
+    public List<Discount> findAll(){
+        return repo.findAll();
+    }
 
 }
