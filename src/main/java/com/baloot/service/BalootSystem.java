@@ -1,13 +1,14 @@
 package com.baloot.service;
 
+import com.baloot.exception.CommodityNotFoundException;
 import com.baloot.exception.InValidInputException;
 import com.baloot.exception.ProviderNotFoundException;
+import com.baloot.exception.UserNotFoundException;
 import com.baloot.model.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -180,4 +180,16 @@ public class BalootSystem {
     }
     public void increaseCredit(int credit){db.increaseCredit(credit);}
     //public Provider getProvider(int id) throws ProviderNotFoundException { return db.getProviderById(id); }
+    public void addToCart(String userId, int commodityId) throws UserNotFoundException, CommodityNotFoundException {
+        User user = userService.findUserById(userId);
+        Commodity commodity = commodityService.getCommodityById(commodityId);
+
+        // Create a new CartCommodity instance and add it to the user's buy list
+        CartCommodity cartCommodity = new CartCommodity(commodity);
+        user.getBuyList().addCartCommodity(cartCommodity);
+
+        // Update the user in the database
+        userRepository.save(user);
+    }
+
 }
