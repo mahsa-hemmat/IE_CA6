@@ -4,6 +4,7 @@ import com.baloot.exception.CommodityNotFoundException;
 import com.baloot.model.Commodity;
 import com.baloot.repository.CommodityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +24,21 @@ public class CommodityService {
             return result.get();
         }
         throw new CommodityNotFoundException(id);
+    }
+
+    public List<Commodity> getCommodities(){
+        return repo.findAll();
+    }
+//    public List<Commodity> filterByCategory(String category){
+//        return repo.f
+//    }
+
+    public List<Commodity> filterByName(String name){
+        return repo.filterByName(name);
+    }
+
+    public List<Commodity> filterByProviderName(String name){
+        return repo.filterByProviderName(name);
     }
     public void save(Commodity commodity) {
         repo.save(commodity);

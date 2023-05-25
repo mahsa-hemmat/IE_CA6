@@ -187,6 +187,21 @@ public class BalootSystem {
     public Commodity getCommodity(int id) throws CommodityNotFoundException {
         return commodityService.getCommodityById(id);
     }
+
+    public List<Commodity> getCommodities(){
+        return commodityService.getCommodities();
+    }
+//    public List<Commodity> filterByCategory(String category){
+//        return repo.f
+//    }
+
+    public List<Commodity> filterByName(String name){
+        return commodityService.filterByName(name);
+    }
+
+    public List<Commodity> filterByProviderName(String name){
+        return commodityService.filterByProviderName(name);
+    }
     public void increaseCredit(int credit){db.increaseCredit(credit);}
     //public Provider getProvider(int id) throws ProviderNotFoundException { return db.getProviderById(id); }
 
@@ -226,7 +241,7 @@ public class BalootSystem {
         }
         userService.save(user);
     }
-
+  
     public List<Commodity> getHistoryList() {
         if(historyListService.findAll().isEmpty())
             return null;
