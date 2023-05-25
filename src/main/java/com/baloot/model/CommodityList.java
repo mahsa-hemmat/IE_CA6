@@ -85,10 +85,9 @@ public class CommodityList {
         }
         return filteredCommodities;
     }*/
-    @Autowired
-    private CommodityFinder commodityFinder;
-    public List<Commodity> filterByName(@Param("name") String name) {
-        return commodityFinder.filterByName(name);
+//
+//    public List<Commodity> filterByName(@Param("name") String name) {
+//        return commodityFinder.filterByName(name);
 //        List<String> names = new ArrayList<>();
 //        name = name.toLowerCase().trim().replaceAll("\\s+", " ");
 //        if (name.contains(","))
@@ -115,10 +114,10 @@ public class CommodityList {
 //            }
 //        }
 //        return nameFiltered;
-    }
+ //   }
 
-    public List<Commodity> filterByCategory(String category){
-        return commodityFinder.filterByCategory(category);
+//    public List<Commodity> filterByCategory(String category){
+//        return commodityFinder.filterByCategory(category);
 //        List<String> cat = new ArrayList<>();
 //        category = category.toLowerCase().trim().replaceAll("\\s+", " ");
 //        if (category.contains(","))
@@ -133,9 +132,9 @@ public class CommodityList {
 //                list.add(co);
 //        }
 //        return list;
-    }
-    public List<Commodity> filterByProviderName(String name){
-        return commodityFinder.filterByProviderName(name);
+   // }
+//    public List<Commodity> filterByProviderName(String name){
+//        return commodityFinder.filterByProviderName(name);
 //        List<String> names = new ArrayList<>();
 //        name = name.toLowerCase().trim().replaceAll("\\s+", " ");
 //        if (name.contains(","))
@@ -162,7 +161,7 @@ public class CommodityList {
 //            }
 //        }
 //        return nameFiltered;
-    }
+   // }
 
     public boolean hasCommodity(int id){
         return (commodities.containsKey(id));
