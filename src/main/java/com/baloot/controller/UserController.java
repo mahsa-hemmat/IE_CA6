@@ -43,6 +43,8 @@ public class UserController {
         try {
             List<List<Object>> results = balootSystem.getBuyList();
             List<CartCommodity> commodities = new ArrayList<>();
+            if(results==null)
+                return ResponseEntity.status(HttpStatus.OK).body(commodities);
             for (List<Object> re:results) {
                 CartCommodity c = new CartCommodity((Integer) re.get(0), (String) re.get(1), (Integer) re.get(5), (Integer) re.get(2),
                         (Set<Category>) re.get(7), (Double) re.get(3), (Integer) re.get(4), (String) re.get(6));
@@ -97,6 +99,8 @@ public class UserController {
         try {
             List<List<Object>> results = balootSystem.getHistoryList();
             List<CartCommodity> commodities = new ArrayList<>();
+            if(results==null)
+                return ResponseEntity.status(HttpStatus.OK).body(commodities);
             for (List<Object> re:results) {
                 CartCommodity c = new CartCommodity((Integer) re.get(0), (String) re.get(1), (Integer) re.get(5), (Integer) re.get(2),
                     (Set<Category>) re.get(7), (Double) re.get(3), (Integer) re.get(4), (String) re.get(6));
