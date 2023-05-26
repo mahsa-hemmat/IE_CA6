@@ -1,6 +1,5 @@
 package com.baloot.model;
 
-import com.baloot.model.id.CommentId;
 import com.baloot.model.id.VoteId;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
