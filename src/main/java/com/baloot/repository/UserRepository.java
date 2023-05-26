@@ -13,4 +13,6 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
 
+    @Query(value = "SELECT u FROM User u WHERE u.email = ?1")
+    User userExistsByEmail(String email);
 }

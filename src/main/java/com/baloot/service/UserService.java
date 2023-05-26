@@ -36,4 +36,11 @@ public class UserService {
         repo.saveAll(users);
     }
 
+    public boolean userExists(String username) {
+        return repo.existsById(username);
+    }
+
+    public boolean userExistsByEmail(String email) {
+        return repo.userExistsByEmail(email) != null;
+    }
 }

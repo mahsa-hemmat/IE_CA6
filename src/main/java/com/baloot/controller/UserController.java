@@ -24,23 +24,24 @@ public class UserController {
         this.balootSystem = balootSystem;
     }
 
-    /*
     @GetMapping("")
     public ResponseEntity<Object> getUser() {
         try {
-            UserInfo userInfo = new UserInfo(BalootSystem.getInstance().getLoggedInUser());
+            UserInfo userInfo = new UserInfo(balootSystem.getLoggedInUser());
             return ResponseEntity.status(HttpStatus.OK).body(userInfo);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
-    }*/
+    }
 
     @GetMapping("/buylist")
     public ResponseEntity<Object> getBuyList() {
+        if(!balootSystem.hasAnyUserLoggedIn()){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not logged in. Please login first");
+        }
         try {
-            //User user = BalootSystem.getInstance().getLoggedInUser();
-            List<List<Object>> results = balootSystem.getBuyList("amir");
+            List<List<Object>> results = balootSystem.getBuyList();
             List<CartCommodity> commodities = new ArrayList<>();
             for (List<Object> re:results) {
                 CartCommodity c = new CartCommodity((Integer) re.get(0), (String) re.get(1), (Integer) re.get(5), (Integer) re.get(2),
@@ -56,9 +57,11 @@ public class UserController {
 
     @PostMapping("/buylist")
     public ResponseEntity<Object> addToBuyList(@RequestParam(value = "commodityId") int commodityId) {
+        if(!balootSystem.hasAnyUserLoggedIn()){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not logged in. Please login first");
+        }
         try {
-            //BalootSystem.getInstance().getLoggedInUser();
-            balootSystem.addToBuyList("amir" ,commodityId);
+            balootSystem.addToBuyList(commodityId);
             return ResponseEntity.status(HttpStatus.OK).body("Commodity is added to buylist successfully.");
         } catch (OutOfStockException ex) {
             System.out.println(ex.getMessage());
@@ -74,27 +77,25 @@ public class UserController {
 
     @DeleteMapping("/buylist")
     public ResponseEntity<Object> removeFromBuyList(@RequestParam(value = "commodityId") int commodityId) {
+        if(!balootSystem.hasAnyUserLoggedIn()){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not logged in. Please login first");
+        }
         try {
-            //User user = BalootSystem.getInstance().getLoggedInUser();
-            balootSystem.removeCommodityFromBuyList("amir", commodityId);
+            balootSystem.removeCommodityFromBuyList(commodityId);
             return ResponseEntity.status(HttpStatus.OK).body("Commodity is removed from buy list successfully.");
-        } catch (CommodityNotFoundException ex) {
+        } catch (CommodityNotFoundException | UserNotFoundException ex) {
             System.out.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        //} catch (InValidInputException ex) {
-        //    System.out.println(ex.getMessage());
-        //    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
-        } catch (UserNotFoundException e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
     @GetMapping("/history")
     public ResponseEntity<Object> getHistory() {
+        if(!balootSystem.hasAnyUserLoggedIn()){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not logged in. Please login first");
+        }
         try {
-            //User user = BalootSystem.getInstance().getLoggedInUser();
-            List<List<Object>> results = balootSystem.getHistoryList("amir");
+            List<List<Object>> results = balootSystem.getHistoryList();
             List<CartCommodity> commodities = new ArrayList<>();
             for (List<Object> re:results) {
                 CartCommodity c = new CartCommodity((Integer) re.get(0), (String) re.get(1), (Integer) re.get(5), (Integer) re.get(2),
@@ -102,9 +103,6 @@ public class UserController {
                 commodities.add(c);
             }
             return ResponseEntity.status(HttpStatus.CREATED).body(commodities);
-        //} catch (InValidInputException ex) {
-        //    System.out.println(ex.getMessage());
-        //    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
         } catch (UserNotFoundException e) {
             throw new RuntimeException(e);
         }

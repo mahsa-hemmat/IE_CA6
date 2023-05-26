@@ -3,6 +3,7 @@ package com.baloot.controller;
 import com.baloot.info.AbstractCommodityInfo;
 import com.baloot.model.*;
 import com.baloot.service.BalootSystem;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.*;
 public class CommodityController {
     private final BalootSystem balootSystem;
 
+    @Autowired
     public CommodityController(BalootSystem balootSystem) {
         this.balootSystem = balootSystem;
     }
@@ -22,6 +24,8 @@ public class CommodityController {
     public ResponseEntity<Object> getCommodities(@RequestParam(value = "searchType", required=false) Integer searchType,
                                                  @RequestParam(value = "keyword", required=false) String keyword,
                                                  @RequestParam(value = "sortType", required=false) String sort) {
+        if (balootSystem.hasAnyUserLoggedIn())
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not logged in. Please login first");
         boolean emptySort = sort == null || sort.isBlank() || sort.isEmpty();
         boolean emptyKeyword = keyword == null || keyword.isBlank() || keyword.isEmpty();
         if (!emptySort && (!sort.equals("name")) && (!sort.equals("price"))) {

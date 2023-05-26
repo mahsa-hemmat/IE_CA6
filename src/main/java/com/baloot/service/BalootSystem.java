@@ -130,6 +130,12 @@ public class BalootSystem {
         userService.saveAll(users);
 
     }
+    public void addUser(User user) {
+        userService.save(user);
+    }
+    public boolean userExists(String username){
+        return userService.userExists(username);
+    }
 
     private String HTTPRequestHandler(String users_url) throws URISyntaxException, IOException {
         URL url =  new URI(users_url).toURL();
@@ -147,8 +153,9 @@ public class BalootSystem {
         bufferedReader.close();
         return strJsonData;
     }
+
     public Boolean hasAnyUserLoggedIn(){
-        return Objects.equals(loggedInUser, "");
+        return !Objects.equals(loggedInUser, "");
     }
     public void logOutUser() throws Exception {
         if(!hasAnyUserLoggedIn())
@@ -162,10 +169,12 @@ public class BalootSystem {
     }
     public void loginInUser(String username, String password) throws UserNotFoundException {
         User user = userService.findUserById(username);
-        if(user != null){
-            if(user.getPassword().equals(password))
-                loggedInUser = user.getUsername();
+        if (user.getPassword().equals(password)) {
+            loggedInUser = user.getUsername();
         }
+    }
+    public boolean isUserValid(String name) throws UserNotFoundException {
+        return userService.findUserById(name) != null;
     }
     public Provider getProvider(int id) throws ProviderNotFoundException {
         return providerService.getProviderById(id);
@@ -194,8 +203,8 @@ public class BalootSystem {
     //public void increaseCredit(int credit){db.increaseCredit(credit);}
 
     @Transactional
-    public void addToBuyList(String userId, int commodityId) throws UserNotFoundException, CommodityNotFoundException, InValidInputException, OutOfStockException {
-        User user = userService.findUserById(userId);
+    public void addToBuyList(int commodityId) throws UserNotFoundException, CommodityNotFoundException, InValidInputException, OutOfStockException {
+        User user = userService.findUserById(loggedInUser);
         Commodity commodity = commodityService.getCommodityById(commodityId);
         if(commodity.getInStock() == 0)
             throw new OutOfStockException(commodityId);
@@ -212,12 +221,12 @@ public class BalootSystem {
         userService.save(user);
         commodityService.save(commodity);
     }
-    public void removeCommodityFromBuyList(String userId,int commodityId) throws CommodityNotFoundException, UserNotFoundException {
-        BuyListId buyListId = new BuyListId(userId, commodityId);
+    public void removeCommodityFromBuyList(int commodityId) throws CommodityNotFoundException, UserNotFoundException {
+        BuyListId buyListId = new BuyListId(loggedInUser, commodityId);
         if(!buyListService.existsById(buyListId))
             throw new CommodityNotFoundException(commodityId);
         buyListService.deleteById(buyListId);
-        User user = userService.findUserById(userId);
+        User user = userService.findUserById(loggedInUser);
         List<BuyList> buyLists = user.getBuyList();
         Iterator<BuyList> iterator = buyLists.iterator();
         while (iterator.hasNext()) {
@@ -230,17 +239,8 @@ public class BalootSystem {
         userService.save(user);
     }
 
-    public List<Commodity> getHistoryList() {
-        if(historyListService.findAll().isEmpty())
-            return null;
-        List<HistoryList> historyLists = historyListService.findAll();
-        List<Commodity> commodities = new ArrayList<>();
-        for(HistoryList historyList:historyLists)
-            commodities.add(historyList.getCommodity());
-        return commodities;
-    }
-    public List<List<Object>> getHistoryList(String username) throws UserNotFoundException {
-        User user = userService.findUserById(username);
+    public List<List<Object>> getHistoryList() throws UserNotFoundException {
+        User user = userService.findUserById(loggedInUser);
         List<List<Object>> results = historyListService.getUserCommodities(user);
         if(results.isEmpty())
             return null;
@@ -251,8 +251,8 @@ public class BalootSystem {
         return results;
     }
 
-    public List<List<Object>> getBuyList(String username) throws UserNotFoundException {
-        User user = userService.findUserById(username);
+    public List<List<Object>> getBuyList() throws UserNotFoundException {
+        User user = userService.findUserById(loggedInUser);
         List<List<Object>> results = buyListService.getUserCommodities(user);
         if(results.isEmpty())
             return null;
@@ -261,5 +261,10 @@ public class BalootSystem {
             lo.add(categories);
         }
         return results;
+    }
+
+
+    public boolean userExistsByEmail(String email) {
+        return userService.userExistsByEmail(email);
     }
 }

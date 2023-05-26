@@ -23,41 +23,32 @@ public class ProviderController {
 
     @GetMapping("/{provider_id}")
     public ResponseEntity<Object> getProvider(@PathVariable int provider_id) throws Exception {
-        Provider provider = balootSystem.getProvider(provider_id);
-        ProviderInfo providerInfo = new ProviderInfo(provider);
-        return ResponseEntity.status(HttpStatus.OK).body(providerInfo);
-
-        /*if (!BalootSystem.getInstance().hasAnyUserLoggedIn())
+        if (!balootSystem.hasAnyUserLoggedIn())
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not logged in. Please login first");
         try {
-            ProviderInfo providerInfo = new ProviderInfo(BalootSystem.getInstance().getProvider(provider_id));
+            Provider provider = balootSystem.getProvider(provider_id);
+            ProviderInfo providerInfo = new ProviderInfo(provider);
             return ResponseEntity.status(HttpStatus.OK).body(providerInfo);
 
         } catch (ProviderNotFoundException ex) {
             System.out.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        }*/
+        }
     }
 
     @GetMapping("/{provider_id}/commodities")
     public ResponseEntity<Object> getProviderCommodities(@PathVariable int provider_id) throws ProviderNotFoundException {
-        ArrayList<AbstractCommodityInfo> abstractCommodityInfos = new ArrayList<>();
-        for(Commodity commodity : balootSystem.getProvider(provider_id).getCommodities()){
-            abstractCommodityInfos.add(new AbstractCommodityInfo(commodity));
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(abstractCommodityInfos);
-
-        /*if (!BalootSystem.getInstance().hasAnyUserLoggedIn())
+        if (!balootSystem.hasAnyUserLoggedIn())
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not logged in. Please login first");
         try {
             ArrayList<AbstractCommodityInfo> abstractCommodityInfos = new ArrayList<>();
-            for(Commodity commodity : BalootSystem.getInstance().getProvider(provider_id).getCommodities()){
+            for(Commodity commodity : balootSystem.getProvider(provider_id).getCommodities()){
                 abstractCommodityInfos.add(new AbstractCommodityInfo(commodity));
             }
             return ResponseEntity.status(HttpStatus.OK).body(abstractCommodityInfos);
         } catch (ProviderNotFoundException ex) {
             System.out.println(ex.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        }*/
+        }
     }
 }

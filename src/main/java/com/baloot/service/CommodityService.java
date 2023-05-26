@@ -25,18 +25,15 @@ public class CommodityService {
         }
         throw new CommodityNotFoundException(id);
     }
-
     public List<Commodity> getCommodities(){
         return repo.findAll();
     }
-//    public List<Commodity> filterByCategory(String category){
+    //    public List<Commodity> filterByCategory(String category){
 //        return repo.f
 //    }
-
     public List<Commodity> filterByName(String name){
         return repo.filterByName(name);
     }
-
     public List<Commodity> filterByProviderName(String name){
         return repo.filterByProviderName(name);
     }
