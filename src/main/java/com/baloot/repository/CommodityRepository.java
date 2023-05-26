@@ -14,12 +14,12 @@ public interface CommodityRepository extends JpaRepository<Commodity, Integer>{
     @Query("SELECT ca.type FROM Commodity c JOIN c.categories ca WHERE c.id = ?1")
     Set<String> getCategoriesForCommodity(int commodityId);
     
-    @Query(value = "select c from Commodity c where c.name like '%:name%' ")
+    @Query(value = "select c from Commodity c where c.name LIKE %:name% ")
     public List<Commodity> filterByName(@Param("name") String name);
 
 //    @Query(value= "select c from Commodity c, Category ca where ca.type=:category and ca.id = any(c.categories)")
 //    public List<Commodity> filterByCategory(@Param("category") String category);
 
-    @Query(value= "select c from Commodity c inner join Provider p on c.provider.id=p.id where p.name=:name ")
+    @Query(value = "SELECT c FROM Commodity c JOIN FETCH c.provider p WHERE p.name LIKE %:name%")
     public List<Commodity> filterByProviderName(@Param("name") String name);
 }
