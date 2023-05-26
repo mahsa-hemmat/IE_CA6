@@ -21,7 +21,10 @@ public class User {
     private List<BuyList> buyList = new ArrayList<>();
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<HistoryList> historyList = new ArrayList<>();
-
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Rating> ratings = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -30,11 +33,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "discount_id")
     )
     private List<Discount> discounts = new ArrayList<>();
-    @ElementCollection
-    @MapKeyColumn(name = "commodity_id")
-    @Column(name = "rating")
-    @CollectionTable(name = "user_ratings", joinColumns = @JoinColumn(name = "user_id"))
-    private Map<Integer, Integer> ratings = new HashMap<>();
     @Transient
     private String lastDiscountUsed = null;
 
@@ -108,11 +106,11 @@ public class User {
         this.historyList = historyList;
     }
 
-    public Map<Integer, Integer> getRatings() {
+    public List<Rating> getRatings() {
         return ratings;
     }
 
-    public void setRatings(Map<Integer, Integer> ratings) {
+    public void setRatings(List<Rating> ratings) {
         this.ratings = ratings;
     }
 
@@ -124,7 +122,7 @@ public class User {
         this.discounts = discounts;
     }
 
-    public int getRating(int rating, int id){
+    /*public int getRating(int rating, int id){
         int curr_rating=rating;
         if(ratings.containsKey(id)){
             curr_rating=rating-ratings.get(id);
@@ -142,7 +140,7 @@ public class User {
 
 
     public void completePurchase() throws NotEnoughCreditException, BuyListIsEmptyException, OutOfStockException {
-        /*int price = 0;
+        int price = 0;
         if (buyList.getDiscount() == 0)
             price = buyList.getTotalCost().get("originalPrice");
         else
@@ -160,10 +158,10 @@ public class User {
         purchasedList.putAll(buyList.getCommodities());
         buyList = new BuyList();
         if(lastDiscountUsed != null)
-            discounts.get(lastDiscountUsed).setAlreadyUsed(true);*/
+            discounts.get(lastDiscountUsed).setAlreadyUsed(true);
     }
 
-    /*public void addDiscount(Discount discount){
+    public void addDiscount(Discount discount){
         discounts.put(discount.getDiscountCode(), discount);
     }
     public Boolean isDiscountValid(String discountCode){return discounts.containsKey(discountCode);}

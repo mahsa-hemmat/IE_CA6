@@ -6,17 +6,17 @@ import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
-public class CommentId implements Serializable {
+public class RatingId implements Serializable {
     @Column(name = "user_id")
     private String username;
 
     @Column(name = "commodity_id")
     private Integer commodityId;
 
-    public CommentId() {
+    public RatingId() {
     }
 
-    public CommentId(String username, Integer commodityId) {
+    public RatingId(String username, Integer commodityId) {
         this.username = username;
         this.commodityId = commodityId;
     }

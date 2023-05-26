@@ -90,7 +90,7 @@ public class DataBase {
     }
 
     public void increaseCredit(int amount){
-        users.get(loggedInUser.getUsername()).increaseCredit(amount);
+        //users.get(loggedInUser.getUsername()).increaseCredit(amount);
     }
 
     public Commodity getCommodityById(int id) throws CommodityNotFoundException {

@@ -1,6 +1,8 @@
 package com.baloot.controller;
 
+import com.baloot.exception.CommodityNotFoundException;
 import com.baloot.info.AbstractCommodityInfo;
+import com.baloot.info.CommentInfo;
 import com.baloot.model.*;
 import com.baloot.service.BalootSystem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @RestController
@@ -24,7 +27,7 @@ public class CommodityController {
     public ResponseEntity<Object> getCommodities(@RequestParam(value = "searchType", required=false) Integer searchType,
                                                  @RequestParam(value = "keyword", required=false) String keyword,
                                                  @RequestParam(value = "sortType", required=false) String sort) {
-        if (balootSystem.hasAnyUserLoggedIn())
+        if (!balootSystem.hasAnyUserLoggedIn())
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not logged in. Please login first");
         boolean emptySort = sort == null || sort.isBlank() || sort.isEmpty();
         boolean emptyKeyword = keyword == null || keyword.isBlank() || keyword.isEmpty();
@@ -114,19 +117,18 @@ public class CommodityController {
 //        }
 //    }
 //
-//    @GetMapping("/{commodity_id}/comments")
-//    public ResponseEntity<Object> getCommodityComments(@PathVariable int commodity_id) {
-//        if (!BalootSystem.getInstance().hasAnyUserLoggedIn())
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not logged in. Please login first");
-//        try {
-//            List<Comment> comments = new ArrayList<>(BalootSystem.getInstance().getDataBase().getCommodityById(commodity_id).getComments().values());
-//            return ResponseEntity.status(HttpStatus.OK).body(comments);
-//        } catch (CommodityNotFoundException ex) {
-//            System.out.println(ex.getMessage());
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-//        }
-//    }
-//
+    @GetMapping("/{commodity_id}/comments")
+    public ResponseEntity<Object> getCommodityComments(@PathVariable int commodity_id) {
+        if (!balootSystem.hasAnyUserLoggedIn())
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You are not logged in. Please login first");
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(balootSystem.getCommodityComments(commodity_id));
+        } catch (CommodityNotFoundException ex) {
+            System.out.println(ex.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        }
+    }
+
 //    @GetMapping("/{commodity_id}/recommended")
 //    public ResponseEntity<Object> getRecommendedCommodities(@PathVariable int commodity_id) {
 //        if (!BalootSystem.getInstance().hasAnyUserLoggedIn())

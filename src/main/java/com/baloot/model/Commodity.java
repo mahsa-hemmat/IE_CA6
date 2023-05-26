@@ -33,11 +33,14 @@ public class Commodity {
     private List<BuyList> buyLists = new ArrayList<>();
     @OneToMany(mappedBy = "commodity", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<HistoryList> historyLists = new ArrayList<>();
+    @OneToMany(mappedBy = "commodity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Rating> ratings = new ArrayList<>();
+    @OneToMany(mappedBy = "commodity", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
     @Transient
     private double totalRating = 0;
     @Transient
     private int ratingCount = 1;
-    //Map<UUID,Comment> comments = new HashMap<>();
     public Commodity(){}
     public Commodity(Integer id, String name, Integer price, double rating, Integer inStock, String image){
         this.id = id;
@@ -118,6 +121,14 @@ public class Commodity {
 
     public void setHistoryLists(List<HistoryList> historyLists) {
         this.historyLists = historyLists;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
     /*public Map<UUID, Comment> getComments() {
         return comments;

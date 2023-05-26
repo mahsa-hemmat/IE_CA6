@@ -43,4 +43,11 @@ public class UserService {
     public boolean userExistsByEmail(String email) {
         return repo.userExistsByEmail(email) != null;
     }
+
+    public User findUserByEmail(String email) throws UserNotFoundException {
+        User user = repo.userExistsByEmail(email);
+        if(user == null)
+            throw new UserNotFoundException(email);
+        return user;
+    }
 }

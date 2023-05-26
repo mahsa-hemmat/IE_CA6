@@ -1,6 +1,7 @@
 package com.baloot.service;
 
 import com.baloot.exception.*;
+import com.baloot.info.CommentInfo;
 import com.baloot.model.*;
 import com.baloot.model.id.BuyListId;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -16,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Component
@@ -27,11 +30,13 @@ public class BalootSystem {
     private final DiscountService discountService;
     private final BuyListService buyListService;
     private final HistoryListService historyListService;
+    private final CommentService commentService;
     private String loggedInUser = "";
 
     @Autowired
     public BalootSystem(ProviderService ps, CommodityService cs, CategoryService cas, UserService us,
-                        DiscountService ds, BuyListService buys, HistoryListService hist) {
+                        DiscountService ds, BuyListService buys, HistoryListService hist,
+                        CommentService cvs) {
         this.providerService = ps;
         this.commodityService = cs;
         this.categoryService = cas;
@@ -39,6 +44,19 @@ public class BalootSystem {
         this.discountService = ds;
         this.buyListService = buys;
         this.historyListService = hist;
+        this.commentService = cvs;
+    }
+
+    public void voteComment(Long commentId, int vote) throws CommentNotFoundException {
+        Comment comment = commentService.findCommentById(commentId);
+        if(vote == 1) {
+            int like = comment.getLikeCount();
+            comment.setLikeCount(++like);
+        } else if (vote == -1){
+            int dislike = comment.getDislikeCount();
+            comment.setDislikeCount(++dislike);
+        }
+        commentService.saveComment(comment);
     }
 
     @PostConstruct
@@ -49,7 +67,7 @@ public class BalootSystem {
             importUsers();
             importProviders();
             importCommodities();
-            //importComments();
+            importComments();
             System.out.println("Done");
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -62,11 +80,34 @@ public class BalootSystem {
         discountService.saveAll(discounts);
     }
 
-    private void importComments() throws Exception{
+    private void importComments() throws Exception {
         String strJsonData = HTTPRequestHandler("http://5.253.25.110:5000/api/comments");
         ObjectMapper mapper = new ObjectMapper();
-        List<Comment> comments = mapper.readValue(strJsonData, new TypeReference<List<Comment>>(){});
-        //db.addComment(comments);
+        JsonNode jsonNode = mapper.readTree(strJsonData);
+        if(jsonNode.isArray()){
+            for (JsonNode commentNode : jsonNode) {
+                String email = commentNode.get("userEmail").asText();
+                int commodity_id = commentNode.get("commodityId").asInt();
+                String text = commentNode.get("text").asText();
+                DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                String d = commentNode.get("date").asText();
+                LocalDate date;
+                User user = userService.findUserByEmail(email);
+                Commodity commodity = commodityService.getCommodityById(commodity_id);
+                Comment comment;
+                if(!d.isEmpty()) {
+                     date = LocalDate.parse(d, DATE_FORMATTER);
+                     comment = new Comment();
+                     comment.setUser(user);
+                     comment.setCommodity(commodity);
+                     comment.setText(text);
+                     comment.setDate(date);
+                }
+                else
+                    comment = new Comment(user, commodity, text);
+                commentService.saveComment(comment);
+            }
+        }
     }
 
     private void importCommodities() throws Exception{
@@ -266,5 +307,25 @@ public class BalootSystem {
 
     public boolean userExistsByEmail(String email) {
         return userService.userExistsByEmail(email);
+    }
+
+    public void addComment(String text, int commodityId) throws UserNotFoundException, CommodityNotFoundException {
+        User user = userService.findUserById(loggedInUser);
+        Commodity commodity = commodityService.getCommodityById(commodityId);
+        Comment comment = new Comment(user, commodity, text);
+        commentService.saveComment(comment);
+    }
+
+    public List<CommentInfo> getCommodityComments(int commodityId) throws CommodityNotFoundException {
+        Commodity commodity = commodityService.getCommodityById(commodityId);
+        List<CommentInfo> comments = new ArrayList<>();
+        for(Comment comment:commentService.findByCommodity(commodityId)) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+            String formattedDate = comment.getDate().format(formatter);
+            comments.add(new CommentInfo(comment.getId(), comment.getUser().getEmail(),
+                    comment.getCommodity().getId(), comment.getText(),formattedDate,comment.getLikeCount(),
+                    comment.getDislikeCount()));
+        }
+        return comments;
     }
 }
