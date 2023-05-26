@@ -64,8 +64,7 @@ public class BuyList {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof BuyList)) return false;
-        BuyList buylist = (BuyList) o;
+        if (!(o instanceof BuyList buylist)) return false;
         return Objects.equals(id, buylist.id) &&
                 Objects.equals(user, buylist.user)&&
                 Objects.equals(commodity, buylist.commodity) &&

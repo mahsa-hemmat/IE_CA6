@@ -8,6 +8,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -59,8 +62,18 @@ public class BalootSystem {
         commentService.saveComment(comment);
     }
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public boolean areTablesCreated() {
+        Query query = entityManager.createNativeQuery("SELECT 1 FROM baloot.user LIMIT 1");
+        return query.getResultList().size() > 0;
+    }
+
     @PostConstruct
     public void readDataFromServer() {
+        if(areTablesCreated())
+            return;
         try {
             System.out.println("Importing data ...");
             importDiscounts();
