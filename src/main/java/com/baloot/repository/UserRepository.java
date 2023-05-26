@@ -15,4 +15,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query(value = "SELECT u FROM User u WHERE u.email = ?1")
     User userExistsByEmail(String email);
+
+    @Query(value = "UPDATE User set credit=:credit where username=:loggedInUser")
+    public void increaseCredit(@Param("loggedInUser") String loggedInUser,@Param("credit") int credit);
 }

@@ -341,4 +341,18 @@ public class BalootSystem {
         }
         return comments;
     }
+
+    public void rateCommodity(Integer commodityId, int score) throws CommodityNotFoundException, UserNotFoundException, ScoreOutOfBoundsException {
+        commodityService.rateCommodity(commodityId,score);
+    }
+
+
+    public List<Commodity> recommenderSystem(int commodityId) throws CommodityNotFoundException {
+        return commodityService.recommenderSystem(commodityId);
+    }
+
+    public void increaseCredit(int credit) {
+        userService.increaseCredit(loggedInUser,credit);
+
+    }
 }

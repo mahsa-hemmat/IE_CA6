@@ -17,9 +17,13 @@ public interface CommodityRepository extends JpaRepository<Commodity, Integer>{
     @Query(value = "select c from Commodity c where c.name LIKE %:name% ")
     public List<Commodity> filterByName(@Param("name") String name);
 
-//    @Query(value= "select c from Commodity c, Category ca where ca.type=:category and ca.id = any(c.categories)")
-//    public List<Commodity> filterByCategory(@Param("category") String category);
+    @Query(value= "select c from Commodity c JOIN Category ca where ca.type LIKE %:category%")
+    public List<Commodity> filterByCategory(@Param("category") String category);
 
     @Query(value = "SELECT c FROM Commodity c JOIN FETCH c.provider p WHERE p.name LIKE %:name%")
     public List<Commodity> filterByProviderName(@Param("name") String name);
+    @Query(value = "SELECT c1 FROM Commodity c1,Commodity c2 WHERE c2.id=:id ORDER BY c1.rating desc limit 4")
+    public List<Commodity>recommenderSystem(@Param("id") int commodityId);
+    @Query(value = "UPDATE Commodity SET rating=:score WHERE id=:id")
+    void rateCommodity(@Param("id") Integer commodityId,@Param("score") int score);
 }

@@ -50,4 +50,8 @@ public class UserService {
             throw new UserNotFoundException(email);
         return user;
     }
+
+    public void increaseCredit(String loggedInUser, int credit) {
+        repo.increaseCredit(loggedInUser,credit);
+    }
 }
