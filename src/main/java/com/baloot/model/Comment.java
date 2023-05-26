@@ -1,53 +1,70 @@
 package com.baloot.model;
 
-import java.util.UUID;
+import com.baloot.model.id.CommentId;
+import jakarta.persistence.*;
 
+import java.time.LocalDate;
+
+@Entity
+@Table(name = "comment")
 public class Comment {
-    private final UUID id = UUID.randomUUID();
-    private String userEmail;
-    private int commodityId;
+
+    @EmbeddedId
+    private CommentId id;
+
+    @ManyToOne
+    @MapsId("user_id")
+    private User user;
+
+    @ManyToOne
+    @MapsId("commodity_id")
+    private Commodity commodity;
     private String text;
-    private String date;
-    private int like = 0;
-    private int dislike = 0;
+    private LocalDate date;
     public Comment(){};
-    public Comment(String userEmail, int commodityId, String text, String date){
-        this.userEmail = userEmail;
-        this.commodityId = commodityId;
+    public Comment(User user, Commodity commodity, String text){
+        this.id = new CommentId(user.getUsername(), commodity.getId());
+        this.user = user;
+        this.commodity = commodity;
         this.text = text;
-        this.date = date;
+        this.date = LocalDate.now();
     }
-    public String getDate() {
-        return date;
-    }
-    public UUID getId() {
+
+    public CommentId getId() {
         return id;
     }
 
-    public void addLikeDislike(int vote){
-        if(vote == 1)
-            like += 1;
-        else if (vote == -1)
-            dislike += 1;
+    public void setId(CommentId id) {
+        this.id = id;
     }
 
-    public String getUserEmail() {
-        return userEmail;
+    public User getUser() {
+        return user;
     }
-    public Integer getCommodityId() {
-        return commodityId;
+    public void setUser(User user) {
+        this.user = user;
     }
+    public Commodity getCommodity() {
+        return commodity;
+    }
+
+    public void setCommodity(Commodity commodity) {
+        this.commodity = commodity;
+    }
+
     public String getText() {
         return text;
     }
-    public int getLike() {
-        return like;
-    }
-    public int getDislike() {
-        return dislike;
+
+    public void setText(String text) {
+        this.text = text;
     }
 
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail;
+    public LocalDate getDate() {
+        return date;
     }
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
 }

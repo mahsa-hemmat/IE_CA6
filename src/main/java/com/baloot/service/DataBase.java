@@ -105,9 +105,9 @@ public class DataBase {
 
     public void addComment(List<Comment> comments) throws Exception {
         for (Comment comment : comments) {
-            int commodityId = comment.getCommodityId();
-            if (!commodities.hasCommodity(commodityId))
-                throw new CommodityNotFoundException(commodityId);
+            //int commodityId = comment.getCommodityId();
+            //if (!commodities.hasCommodity(commodityId))
+            //    throw new CommodityNotFoundException(commodityId);
             //commodities.getCommodityById(commodityId).addComment(comment);
         }
     }
@@ -117,7 +117,7 @@ public class DataBase {
         String date= formatter.format(new Date());
         if(!commodities.hasCommodity(commodityId))
             throw new CommodityNotFoundException(commodityId);
-        Comment comment = new Comment(loggedInUser.getUsername(), commodityId, text, date);
+        //Comment comment = new Comment(loggedInUser.getUsername(), commodityId, text, date);
         //commodities.getCommodityById(commodityId).addComment(comment);
     }
 
